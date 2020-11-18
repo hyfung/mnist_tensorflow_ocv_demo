@@ -30,7 +30,7 @@ model.compile(optimizer='adam',
     metrics=['accuracy'],
     )
 
-model.fit(x_train, y_train, epochs=1)
+model.fit(x_train, y_train, epochs=10)
 
 # model.evaluate(x_test,  y_test, verbose=2)
 
@@ -49,6 +49,9 @@ def mouse_cb(event, x, y, flags, param):
     global draw
     global mat
 
+    if x > 27 or y > 27 or x < 0 or y < 0:
+        return
+
     if event == cv2.EVENT_LBUTTONDOWN:        
         draw = True
         print('drawing')
@@ -56,11 +59,9 @@ def mouse_cb(event, x, y, flags, param):
     elif event == cv2.EVENT_LBUTTONUP:
         draw = False
         print('stop drawing')
-        # print(mat)
 
     elif event == cv2.EVENT_MOUSEMOVE:
         if draw:
-            # print(x,y)
             mat[y][x] = 255
 
     elif event == cv2.EVENT_LBUTTONDBLCLK:
