@@ -17,6 +17,14 @@ pip3 install -r requirements.txt
 Train the model by doing
 > python3 Train_MNIST_Digit.py
 
-
 ## Using the model
+When training is finished, a new window will pop up and you can draw with a mouse
 
+Result will be written to stdout
+
+![alt text](https://github.com/hyfung/mnist_tensorflow_ocv_demo/blob/white/images/01.png "")
+
+## TODO
+* Save the model
+* Let `MNIST_Digit_Writer.py` to read a saved model instead of training everytime
+* Also upload the CNN version
