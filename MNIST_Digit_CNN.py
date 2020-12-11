@@ -10,12 +10,30 @@ mnist = tf.keras.datasets.mnist
 
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
 
-model = tf.keras.models.Sequential([
-    tf.keras.layers.Flatten(input_shape=(28, 28, 1)),
-    tf.keras.layers.Dense(128, activation='relu'),
-    tf.keras.layers.Dropout(0.2),
-    tf.keras.layers.Dense(10),
-    ])
+img_rows, img_cols = 28, 28
+
+x_train = x_train.reshape(x_train.shape[0], img_rows, img_cols, 1)
+x_test = x_test.reshape(x_test.shape[0], img_rows, img_cols, 1)
+input_shape = (img_rows, img_cols, 1)
+
+x_train = x_train.astype('float32')
+x_test = x_test.astype('float32')
+x_train /= 255
+x_test /= 255
+print('X_train shape:', x_train.shape) #X_train shape: (60000, 28, 28, 1)
+
+##model building
+model = tf.keras.models.Sequential()
+model.add(tf.keras.layers.Conv2D(32, kernel_size=(3, 3),
+                 activation='relu',
+                 input_shape=(28, 28, 1)))
+model.add(tf.keras.layers.Conv2D(64, (3, 3), activation='relu'))
+model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
+model.add(tf.keras.layers.Dropout(0.25))
+model.add(tf.keras.layers.Flatten())
+model.add(tf.keras.layers.Dense(128, activation='relu'))
+model.add(tf.keras.layers.Dropout(0.5))
+model.add(tf.keras.layers.Dense(10, activation='softmax'))
 
 predictions = model(x_train[:1]).numpy()
 
@@ -30,9 +48,9 @@ model.compile(optimizer='adam',
     metrics=['accuracy'],
     )
 
-model.fit(x_train, y_train, epochs=10)
+model.fit(x_train, y_train, epochs=5)
 
-# model.evaluate(x_test,  y_test, verbose=2)
+model.save('mnist_conv')
 
 probability_model = tf.keras.Sequential([
     model,
@@ -62,6 +80,10 @@ def mouse_cb(event, x, y, flags, param):
 
     elif event == cv2.EVENT_MOUSEMOVE:
         if draw:
+            mat[y-1][x-1] = 128
+            mat[y-1][x+1] = 128
+            mat[y+1][x-1] = 128
+            mat[y+1][x+1] = 128
             mat[y][x] = 255
 
     elif event == cv2.EVENT_LBUTTONDBLCLK:
@@ -75,7 +97,8 @@ cv2.setMouseCallback("Drawboard", mouse_cb)
 while True:
     cv2.imshow('Drawboard', mat)
 
-    new_mat = np.reshape(mat,(1,784))
+    # new_mat = np.reshape(mat,(1,784))
+    new_mat = np.reshape(mat,(1, 28, 28, 1))
     print(np.argmax(probability_model(new_mat)))
     
     if cv2.waitKey(100) & 0xFF == ord('q'):
