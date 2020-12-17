@@ -6,6 +6,15 @@ import tensorflow as tf
 import numpy as np
 import cv2
 
+# Added to fix CUDA 11.2 & Tensorflow 2.4.0
+from tensorflow.compat.v1 import ConfigProto
+from tensorflow.compat.v1 import InteractiveSession
+
+config = ConfigProto()
+config.gpu_options.allow_growth = True
+session = InteractiveSession(config=config)
+# ---------
+
 mnist = tf.keras.datasets.mnist
 
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
